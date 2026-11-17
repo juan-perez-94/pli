@@ -1,0 +1,37 @@
+---
+// PostHog analytics for the landing.
+// Loads only when PUBLIC_POSTHOG_KEY is set, so local dev without a key stays clean.
+//
+// Custom events: add data-ph-event="event_name" to any link or button and it is
+// captured on click. Extra properties go in data-ph-* attributes, e.g.
+//   <a href="..." data-ph-event="cta_clicked" data-ph-location="hero">Join the pilot</a>
+// sends { location: "hero" }.
+---
+
+<script>
+  import posthog from 'posthog-js';
+
+  const key = import.meta.env.PUBLIC_POSTHOG_KEY;
+  const host = import.meta.env.PUBLIC_POSTHOG_HOST ?? 'https://eu.i.posthog.com';
+
+  if (key) {
+    posthog.init(key, {
+      api_host: host,
+      defaults: '2025-05-24', // pageviews + pageleaves handled automatically
+      person_profiles: 'identified_only',
+    });
+
+    document.addEventListener('click', (event) => {
+      const el = (event.target as HTMLElement | null)?.closest<HTMLElement>('[data-ph-event]');
+      if (!el) return;
+      const props: Record<string, string> = {};
+      for (const [name, value] of Object.entries(el.dataset)) {
+        if (name.startsWith('ph') && name !== 'phEvent' && value !== undefined) {
+          const prop = name.slice(2);
+          props[prop.charAt(0).toLowerCase() + prop.slice(1)] = value;
+        }
+      }
+      posthog.capture(el.dataset.phEvent!, props);
+    });
+  }
+</script>

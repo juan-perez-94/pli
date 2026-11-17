@@ -1,0 +1,59 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Pilot flow: landing → Stripe checkout → Youform onboarding
+const CHECKOUT_URL = '#'; // TODO: Stripe payment link
+---
+
+<Layout>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">pli</p>
+      <h1>Letters for the two of you, before “I do”.</h1>
+      <p class="lede">
+        Write separately. Seal your letter. Open them together.
+      </p>
+      <a
+        class="cta"
+        href={CHECKOUT_URL}
+        data-ph-event="pilot_cta_clicked"
+        data-ph-location="hero"
+      >
+        Join the pilot
+      </a>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  main {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: calc(var(--space) * 4) var(--space);
+  }
+  .eyebrow {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    margin: 0 0 calc(var(--space) * 2);
+  }
+  h1 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(2.25rem, 6vw, 3.5rem);
+    line-height: 1.1;
+    margin: 0 0 var(--space);
+  }
+  .lede {
+    color: var(--color-muted);
+    font-size: 1.125rem;
+    margin: 0 0 calc(var(--space) * 1.5);
+  }
+  .cta {
+    display: inline-block;
+    padding: 0.875rem 1.5rem;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    text-decoration: none;
+  }
+</style>
