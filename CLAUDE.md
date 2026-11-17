@@ -15,6 +15,15 @@ Marketing/acquisition landing for **pli**, a guided journal of letters for coupl
 - Tone reference: Once (once.film). Visual direction: editorial, typographic, flat paper-like surfaces.
 - Designs live in Figma — match them faithfully (spacing, type, colors). Put tokens in `src/styles/global.css`.
 
+## Design system
+- Source frame: Figma `DWjtX9B3yCBVRaHIZkNVcu`, node `133:1634` (1440px desktop; no mobile frame — mobile layout is ours).
+- Figma has no variables yet; tokens in `src/styles/global.css` were read from layers. Fonts: Instrument Serif + Instrument Sans (Google Fonts).
+- Type roles are utility classes (`.t-display-xl` … `.t-label`); use them or the tokens, never raw px for color/type.
+- `src/components/ui/` — primitives (Button, Chip, MetaList, LetterCard, Logo, Pli wordmark).
+- `src/components/sections/` — one file per landing section, composed in `src/pages/index.astro`.
+- Pilot facts (price, seats, dates, checkout URL) live in `src/config.ts`.
+- When passing `class` to a child component, the child must spread `...rest` onto its root, or scoped styles won't reach it.
+
 ## Stack
 - Astro (static output), TypeScript strict. Keep JS minimal; prefer `.astro` components and scoped styles.
 - Analytics: **PostHog** via `posthog-js`, set up in `src/components/PostHog.astro` and included in `src/layouts/Layout.astro`.

@@ -1,0 +1,321 @@
+---
+// "How a letter works": three steps that auto-advance, with pagination + pause controls.
+// Steps 02 and 03 have no illustration in Figma yet; until they do, the panel keeps the first one.
+import answerApart from '../../assets/figma/answer-apart.gif';
+import pauseIcon from '../../assets/figma/carousel-next.svg';
+import LetterCard from '../ui/LetterCard.astro';
+
+interface Step {
+  title: string;
+  body: string;
+  media?: { src: string; caption: { plain: string; italic: string } };
+}
+
+const steps: Step[] = [
+  {
+    title: 'Apart',
+    body: "Each of you answers a few questions on your own, in about ten minutes. Nothing is shared until you've both answered.",
+    media: {
+      src: answerApart.src,
+      caption: { plain: 'Your words stay yours ', italic: 'until you’ve both written.' },
+    },
+  },
+  {
+    title: 'Together',
+    body: 'We bring your answers side by side, beautifully laid out, and you open it together, like a letter.',
+  },
+  {
+    title: 'Face to face',
+    body: 'Then you talk about what you found: the things neither of you had said out loud.',
+  },
+];
+
+const panels = steps.map((step, i) => ({ index: i, media: step.media ?? steps[0].media! }));
+---
+
+<section class="how container" aria-labelledby="how-title" data-how>
+  <div class="how__intro">
+    <p class="t-body">How it works</p>
+    <h2 id="how-title" class="t-display-l">How a letter works</h2>
+  </div>
+
+  <ol class="how__steps" role="tablist" aria-label="Steps">
+    {
+      steps.map((step, i) => (
+        <li>
+          <button
+            class="step"
+            type="button"
+            role="tab"
+            id={`how-tab-${i}`}
+            aria-controls={`how-panel-${i}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            data-step={i}
+          >
+            <span class="step__num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="step__title t-heading-m">{step.title}</span>
+            <span class="step__body t-body-l">{step.body}</span>
+          </button>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="how__visual">
+    {
+      panels.map(({ index, media }) => (
+        <LetterCard
+          as="figure"
+          class="panel"
+          id={`how-panel-${index}`}
+          role="tabpanel"
+          aria-labelledby={`how-tab-${index}`}
+          hidden={index !== 0}
+        >
+          <img src={media.src} width="416" height="416" alt="" loading="lazy" decoding="async" />
+          <figcaption class="t-serif-body">
+            {media.caption.plain}
+            <em>{media.caption.italic}</em>
+          </figcaption>
+        </LetterCard>
+      ))
+    }
+  </div>
+
+  <div class="how__controls">
+    <div class="dots">
+      {
+        steps.map((step, i) => (
+          <button
+            class="dot"
+            type="button"
+            aria-label={`Show step ${i + 1}: ${step.title}`}
+            aria-current={i === 0 ? 'step' : undefined}
+            data-step={i}
+          />
+        ))
+      }
+    </div>
+    <button class="toggle" type="button" aria-label="Pause" data-toggle>
+      <img class="toggle__pause" src={pauseIcon.src} width="48" height="48" alt="" />
+      <svg class="toggle__play" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="24" fill="#F6F6F6"></circle>
+        <path d="M19 16.5v15a.6.6 0 0 0 .9.5l12-7.5a.6.6 0 0 0 0-1l-12-7.5a.6.6 0 0 0-.9.5Z" fill="#1B1917"></path>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<script>
+  const INTERVAL = 6000;
+
+  document.querySelectorAll<HTMLElement>('[data-how]').forEach((root) => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('.dot')];
+    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]')!;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let active = 0;
+    let playing = !reduceMotion;
+    let timer: number | undefined;
+
+    const show = (i: number) => {
+      active = (i + tabs.length) % tabs.length;
+      tabs.forEach((tab, j) => {
+        tab.setAttribute('aria-selected', String(j === active));
+        tab.tabIndex = j === active ? 0 : -1;
+      });
+      panels.forEach((panel, j) => (panel.hidden = j !== active));
+      dots.forEach((dot, j) => (j === active ? dot.setAttribute('aria-current', 'step') : dot.removeAttribute('aria-current')));
+    };
+
+    const schedule = () => {
+      window.clearInterval(timer);
+      if (playing) timer = window.setInterval(() => show(active + 1), INTERVAL);
+    };
+
+    const setPlaying = (value: boolean) => {
+      playing = value;
+      toggle.dataset.paused = String(!playing);
+      toggle.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+      schedule();
+    };
+
+    const select = (i: number) => {
+      show(i);
+      schedule();
+    };
+
+    tabs.forEach((tab, i) => tab.addEventListener('click', () => select(i)));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => select(i)));
+    toggle.addEventListener('click', () => setPlaying(!playing));
+
+    root.querySelector('[role="tablist"]')!.addEventListener('keydown', (event) => {
+      const key = (event as KeyboardEvent).key;
+      if (key !== 'ArrowDown' && key !== 'ArrowUp') return;
+      event.preventDefault();
+      select(active + (key === 'ArrowDown' ? 1 : -1));
+      tabs[active].focus();
+    });
+
+    // Only run while visible, so people actually see step 01 first.
+    new IntersectionObserver(([entry]) => {
+      window.clearInterval(timer);
+      if (entry.isIntersecting) schedule();
+    }).observe(root);
+
+    setPlaying(playing);
+  });
+</script>
+
+<style>
+  .how {
+    display: grid;
+    grid-template-columns: minmax(0, 680fr) minmax(0, 476fr);
+    grid-template-areas:
+      'intro visual'
+      'steps visual'
+      'controls controls';
+    column-gap: calc(84 / 1240 * 100%);
+  }
+  .how__intro {
+    grid-area: intro;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .how__steps {
+    grid-area: steps;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin-top: 54px;
+    padding: 0;
+    list-style: none;
+    max-width: 614px;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    column-gap: 20px;
+    row-gap: var(--space-2);
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    color: var(--color-ink-muted);
+    transition: color var(--duration) var(--ease);
+  }
+  .step[aria-selected='true'] {
+    color: var(--color-ink);
+  }
+  .step__num {
+    grid-row: 1;
+    padding-top: var(--space-1);
+    font-size: var(--text-body);
+    line-height: 28px;
+    color: var(--color-accent-muted);
+  }
+  .step[aria-selected='true'] .step__num {
+    color: var(--color-accent);
+  }
+  .step__title {
+    grid-column: 2;
+    line-height: 44px;
+  }
+  .step__body {
+    grid-column: 2;
+  }
+
+  .how__visual {
+    grid-area: visual;
+    align-self: start;
+    margin-top: 60px;
+  }
+  .panel {
+    margin: 0;
+    padding: 22px 30px 54px;
+  }
+  .panel img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+  .panel figcaption {
+    margin-top: 14px;
+    font-size: var(--text-serif-body);
+    line-height: 30px;
+    text-align: center;
+  }
+
+  .how__controls {
+    grid-area: controls;
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-top: clamp(var(--space-7), 6.25vw, 90px);
+  }
+  .dots {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border-radius: var(--radius-pill);
+    background: var(--color-control);
+  }
+  .dot {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--color-ink-subtle);
+    cursor: pointer;
+    transition:
+      width var(--duration) var(--ease),
+      background-color var(--duration) var(--ease);
+  }
+  .dot[aria-current='step'] {
+    width: 80px;
+    background: var(--color-ink);
+  }
+  .toggle {
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+  }
+  .toggle__play,
+  .toggle[data-paused='true'] .toggle__pause {
+    display: none;
+  }
+  .toggle[data-paused='true'] .toggle__play {
+    display: block;
+  }
+
+  @media (max-width: 959px) {
+    .how {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'intro' 'steps' 'visual' 'controls';
+    }
+    .how__steps {
+      margin-top: var(--space-7);
+    }
+    .how__visual {
+      margin-top: var(--space-7);
+      max-width: 476px;
+      width: 100%;
+      justify-self: center;
+    }
+    .how__controls {
+      margin-top: var(--space-7);
+    }
+  }
+</style>

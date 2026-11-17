@@ -1,0 +1,39 @@
+---
+// Inline facts separated by small red dots: "€19 • Only 15 couples • First letter on 20 January".
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'ul'> {
+  items: readonly string[];
+}
+const { items, class: className, ...rest } = Astro.props;
+---
+
+<ul class:list={['meta', className]} {...rest}>
+  {items.map((item) => <li>{item}</li>)}
+</ul>
+
+<style>
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-body);
+    line-height: 1.222;
+  }
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    white-space: nowrap;
+  }
+  li + li::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+</style>

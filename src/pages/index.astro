@@ -1,59 +1,53 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-// Pilot flow: landing → Stripe checkout → Youform onboarding
-const CHECKOUT_URL = '#'; // TODO: Stripe payment link
+import Hero from '../components/sections/Hero.astro';
+import HowItWorks from '../components/sections/HowItWorks.astro';
+import MakeRoom from '../components/sections/MakeRoom.astro';
+import Letters from '../components/sections/Letters.astro';
+import SmallMoments from '../components/sections/SmallMoments.astro';
+import Reassurance from '../components/sections/Reassurance.astro';
+import ReserveBand from '../components/sections/ReserveBand.astro';
+import Faq from '../components/sections/Faq.astro';
+import ReservationBar from '../components/sections/ReservationBar.astro';
 ---
 
 <Layout>
-  <main>
-    <section class="hero">
-      <p class="eyebrow">pli</p>
-      <h1>Letters for the two of you, before “I do”.</h1>
-      <p class="lede">
-        Write separately. Seal your letter. Open them together.
-      </p>
-      <a
-        class="cta"
-        href={CHECKOUT_URL}
-        data-ph-event="pilot_cta_clicked"
-        data-ph-location="hero"
-      >
-        Join the pilot
-      </a>
-    </section>
+  <main class="page">
+    <Hero />
+    <HowItWorks />
+    <MakeRoom />
+    <Letters />
+    <SmallMoments />
+    <Reassurance />
+    <ReserveBand />
+    <Faq />
   </main>
+  <ReservationBar />
 </Layout>
 
 <style>
-  main {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: calc(var(--space) * 4) var(--space);
+  /* Vertical rhythm between sections, from the Figma frame. */
+  .page {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: calc(var(--section-gap-s) + 114px); /* room for the reservation bar */
   }
-  .eyebrow {
-    font-family: var(--font-serif);
-    font-size: 1.25rem;
-    margin: 0 0 calc(var(--space) * 2);
+  .page > :global(* + *) {
+    margin-top: var(--section-gap);
   }
-  h1 {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    font-size: clamp(2.25rem, 6vw, 3.5rem);
-    line-height: 1.1;
-    margin: 0 0 var(--space);
+  .page > :global(.how) {
+    margin-top: clamp(var(--space-8), 15.7vw, 226px);
   }
-  .lede {
-    color: var(--color-muted);
-    font-size: 1.125rem;
-    margin: 0 0 calc(var(--space) * 1.5);
+  .page > :global(.room) {
+    margin-top: clamp(6rem, 24vw, 22rem);
   }
-  .cta {
-    display: inline-block;
-    padding: 0.875rem 1.5rem;
-    border-radius: 999px;
-    background: var(--color-ink);
-    color: var(--color-paper);
-    text-decoration: none;
+  .page > :global(.letters) {
+    margin-top: clamp(6rem, 27.6vw, 25rem);
+  }
+  .page > :global(:has(.band)) {
+    margin-top: var(--section-gap-s);
+  }
+  .page > :global(.faq) {
+    margin-top: clamp(6rem, 15.6vw, 225px);
   }
 </style>

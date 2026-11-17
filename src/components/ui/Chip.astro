@@ -1,0 +1,29 @@
+---
+interface Props {
+  tone?: 'ink' | 'soft';
+}
+const { tone = 'soft' } = Astro.props;
+---
+
+<span class:list={['chip', `chip--${tone}`]}><slot /></span>
+
+<style>
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-xs);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.222;
+    white-space: nowrap;
+  }
+  .chip--ink {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .chip--soft {
+    background: var(--color-line);
+    color: var(--color-ink);
+  }
+</style>

@@ -1,0 +1,73 @@
+---
+import { Image } from 'astro:assets';
+import foundingPhoto from '../../assets/figma/founding-couples.png';
+import bothPhoto from '../../assets/figma/for-both.png';
+import privacyPhoto from '../../assets/figma/privacy.jpg';
+import Pli from '../ui/Pli.astro';
+import { PILOT } from "../../config";
+---
+
+<section class="reassure container" aria-label="For your first edition">
+  <article class="item">
+    <Image class="item__photo" src={foundingPhoto} alt="Two hands raising champagne coupes" widths={[392, 784]} sizes="(min-width: 960px) 392px, 100vw" />
+    <h2 class="t-heading-m">Be one of the <em>first fifteen</em></h2>
+    <p class="t-body-l">
+      <strong>As a founding couple, you shape what <Pli /> becomes.</strong> After each letter, we'll
+      ask you two short questions. At the end, if you'd like, there's a 20-minute chat, and as a
+      thank-you, a free <Pli /> to give to another couple.
+    </p>
+  </article>
+
+  <article class="item">
+    <Image class="item__photo item__photo--both" src={bothPhoto} alt="A couple dancing in their kitchen at night" widths={[392, 784]} sizes="(min-width: 960px) 392px, 100vw" />
+    <h2 class="t-heading-m">For <em>both of you</em></h2>
+    <p class="t-body-l">
+      <strong>{PILOT.price} {PILOT.priceNote}.</strong> Three letters, three evenings, and everything you
+      wrote to keep. Less than one guest's dinner at your wedding. Full refund available until your
+      first letter is opened.
+    </p>
+  </article>
+
+  <article class="item">
+    <Image class="item__photo" src={privacyPhoto} alt="Sealed envelopes laid out on a table" widths={[392, 784]} sizes="(min-width: 960px) 392px, 100vw" />
+    <h2 class="t-heading-m">Sealed means <em>sealed</em></h2>
+    <p class="t-body-l">
+      <strong>Your partner sees your answers only when you open them together.</strong> Our small team
+      reads them to prepare each letter, and no one else does. You keep your letters; we delete our copy
+      on 14 May 2027.
+    </p>
+  </article>
+</section>
+
+<style>
+  .reassure {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+  .item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .item__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 392 / 300;
+    object-fit: cover;
+    margin-bottom: var(--space-2);
+  }
+  .item__photo--both {
+    object-position: 50% 45%;
+  }
+  .item strong {
+    font-weight: var(--weight-medium);
+  }
+
+  @media (max-width: 959px) {
+    .reassure {
+      grid-template-columns: 1fr;
+      row-gap: var(--space-8);
+    }
+  }
+</style>

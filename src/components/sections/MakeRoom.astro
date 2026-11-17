@@ -1,0 +1,58 @@
+---
+import { Image } from 'astro:assets';
+import photo from '../../assets/figma/make-room.png';
+import Pli from '../ui/Pli.astro';
+---
+
+<section class="room container" aria-labelledby="room-title">
+  <Image
+    class="room__photo"
+    src={photo}
+    alt="A couple embracing, blurred in motion"
+    widths={[400, 800]}
+    sizes="(min-width: 960px) 400px, 100vw"
+  />
+  <div class="room__copy">
+    <h2 id="room-title" class="t-display-l">
+      A wedding takes months to plan. <em>A marriage takes a lifetime.</em>
+    </h2>
+    <p class="t-serif-body">
+      Between the venue, the guest list and the seating plan, there's rarely an evening that's only
+      about the two of you. <em><Pli /> gives you three.</em>
+    </p>
+  </div>
+</section>
+
+<style>
+  .room {
+    display: grid;
+    grid-template-columns: minmax(0, 400fr) minmax(0, 744fr);
+    column-gap: calc(96 / 1240 * 100%);
+    align-items: center;
+  }
+  .room__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 400 / 600;
+    object-fit: cover;
+  }
+  .room__copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .room__copy :global(.pli) {
+    font-size: 1em;
+  }
+
+  @media (max-width: 959px) {
+    .room {
+      grid-template-columns: 1fr;
+      row-gap: var(--space-7);
+    }
+    .room__photo {
+      aspect-ratio: 4 / 5;
+      max-height: 70svh;
+    }
+  }
+</style>

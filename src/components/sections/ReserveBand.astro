@@ -1,0 +1,69 @@
+---
+import Button from '../ui/Button.astro';
+import { PILOT } from '../../config';
+---
+
+<section class="container" aria-labelledby="reserve-title">
+  <div class="band">
+    <h2 id="reserve-title" class="band__title t-display-m">
+      Three evenings.<br /><em>Just the two of you.</em>
+    </h2>
+    <div class="band__action">
+      <p class="band__price">
+        <span class="band__amount">{PILOT.price}</span>
+        <span class="band__note">{PILOT.priceNote}</span>
+      </p>
+      <Button location="reserve_band">Reserve your place</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .band {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-7);
+    border-radius: var(--radius-l);
+    background: var(--color-blush);
+  }
+  .band__title {
+    line-height: 66px;
+  }
+  .band__action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-4);
+  }
+  .band__price {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .band__amount {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    line-height: 62px;
+    color: var(--color-accent);
+  }
+  .band__note {
+    font-size: var(--text-small);
+    line-height: 28px;
+  }
+
+  @media (max-width: 959px) {
+    .band {
+      padding: var(--space-6);
+    }
+    .band__title {
+      line-height: var(--leading-display-m);
+    }
+    .band__action {
+      align-items: stretch;
+      width: 100%;
+    }
+  }
+</style>

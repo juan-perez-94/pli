@@ -1,0 +1,168 @@
+---
+// FAQ accordion built on <details>, so it works without JS.
+// Only the first answer is in Figma. The rest are DRAFTS written from facts elsewhere on the page —
+// review them before launch.
+import plusIcon from '../../assets/figma/faq-plus.svg';
+import closeIcon from '../../assets/figma/faq-minus.svg';
+import Pli from '../ui/Pli.astro';
+---
+
+<section class="faq container" aria-labelledby="faq-title" data-faq>
+  <h2 id="faq-title" class="t-display-xl">FAQs</h2>
+
+  <div class="faq__list">
+    <details name="faq" open>
+      <summary>
+        <span class="t-heading-l">What if my partner isn't keen?</span>
+        <span class="icon" aria-hidden="true">
+          <img class="icon__plus" src={plusIcon.src} width="40" height="40" alt="" />
+          <img class="icon__close" src={closeIcon.src} width="40" height="40" alt="" />
+        </span>
+      </summary>
+      <p class="t-body-l">
+        <Pli /> takes two, so show them this page first. It's about ten minutes at a time, nothing is
+        shared until you've both answered, and you have a full refund until your first letter is opened.
+      </p>
+    </details>
+
+    <details name="faq">
+      <summary>
+        <span class="t-heading-l">Is pli counselling?</span>
+        <span class="icon" aria-hidden="true">
+          <img class="icon__plus" src={plusIcon.src} width="40" height="40" alt="" />
+          <img class="icon__close" src={closeIcon.src} width="40" height="40" alt="" />
+        </span>
+      </summary>
+      <!-- DRAFT: not in Figma -->
+      <p class="t-body-l">
+        No. <Pli /> isn't therapy and doesn't replace it. It's a guided way to write to each other, then
+        sit down and talk about what you found.
+      </p>
+    </details>
+
+    <details name="faq">
+      <summary>
+        <span class="t-heading-l">Where do our answers go?</span>
+        <span class="icon" aria-hidden="true">
+          <img class="icon__plus" src={plusIcon.src} width="40" height="40" alt="" />
+          <img class="icon__close" src={closeIcon.src} width="40" height="40" alt="" />
+        </span>
+      </summary>
+      <!-- DRAFT: not in Figma (taken from the "Sealed means sealed" card) -->
+      <p class="t-body-l">
+        Your partner sees your answers only when you open them together. Our small team reads them to
+        prepare each letter, and no one else does. You keep your letters; we delete our copy on 14 May
+        2027.
+      </p>
+    </details>
+
+    <details name="faq">
+      <summary>
+        <span class="t-heading-l">Do we need to plan a date?</span>
+        <span class="icon" aria-hidden="true">
+          <img class="icon__plus" src={plusIcon.src} width="40" height="40" alt="" />
+          <img class="icon__close" src={closeIcon.src} width="40" height="40" alt="" />
+        </span>
+      </summary>
+      <!-- DRAFT: not in Figma -->
+      <p class="t-body-l">
+        No. Each of you answers in about ten minutes, whenever suits you. When your letter is ready, pick
+        a quiet evening at home to open it together.
+      </p>
+    </details>
+
+    <details name="faq">
+      <summary>
+        <span class="t-heading-l">What if a week gets busy?</span>
+        <span class="icon" aria-hidden="true">
+          <img class="icon__plus" src={plusIcon.src} width="40" height="40" alt="" />
+          <img class="icon__close" src={closeIcon.src} width="40" height="40" alt="" />
+        </span>
+      </summary>
+      <!-- DRAFT: not in Figma -->
+      <p class="t-body-l">
+        That's fine. Your letter waits for you, and we put it together once you've both answered.
+      </p>
+    </details>
+  </div>
+</section>
+
+<script>
+  // faq_opened { question } — fired only when an item opens, not when it closes.
+  document.querySelectorAll<HTMLDetailsElement>('[data-faq] details').forEach((item) => {
+    item.addEventListener('toggle', () => {
+      if (!item.open) return;
+      const question = item.querySelector('summary')?.textContent?.trim() ?? '';
+      document.dispatchEvent(new CustomEvent('ph:capture', { detail: { event: 'faq_opened', props: { question } } }));
+    });
+  });
+</script>
+
+<style>
+  .faq {
+    display: grid;
+    grid-template-columns: minmax(0, 454fr) minmax(0, 786fr);
+    align-items: start;
+  }
+  .faq h2 {
+    line-height: 96px;
+  }
+
+  .faq__list {
+    display: flex;
+    flex-direction: column;
+  }
+  details {
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--color-line);
+  }
+  details:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+  details:last-child {
+    padding-bottom: 0;
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  details p {
+    margin-top: var(--space-5);
+  }
+
+  .icon {
+    flex: none;
+    width: 40px;
+    height: 40px;
+  }
+  .icon__close,
+  details[open] .icon__plus {
+    display: none;
+  }
+  details[open] .icon__close {
+    display: block;
+  }
+
+  @media (max-width: 959px) {
+    .faq {
+      grid-template-columns: 1fr;
+      row-gap: var(--space-6);
+    }
+    .faq h2 {
+      line-height: var(--leading-display-xl);
+    }
+    .icon {
+      width: 32px;
+      height: 32px;
+    }
+  }
+</style>

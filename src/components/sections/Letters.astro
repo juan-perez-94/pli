@@ -1,0 +1,114 @@
+---
+import LetterCard from '../ui/LetterCard.astro';
+
+const letters = [
+  {
+    number: '001',
+    date: '20 January',
+    question: 'Saving, spending, and what "enough" means to each of you.',
+    theme: 'Through Your Eyes',
+  },
+  {
+    number: '002',
+    date: '29 January',
+    question: "What comes first when everything can't.",
+    theme: 'When Life Gets Busy',
+  },
+  {
+    number: '003',
+    date: '7 February',
+    question: 'Ten years from now, where do you wake up?',
+    theme: 'The Life We Want',
+  },
+];
+---
+
+<section class="letters container" aria-labelledby="letters-title">
+  <header class="letters__intro">
+    <h2 id="letters-title" class="t-display-l">One winter, <em>three letters</em></h2>
+    <p class="letters__sub t-body-l">
+      Three letters over four weeks, about ten minutes each to answer.
+      <em class="t-accent">The last one opens on Valentine's Day.</em>
+    </p>
+  </header>
+
+  <ol class="letters__list">
+    {
+      letters.map((letter) => (
+        <li>
+          <LetterCard class="letter">
+            <div class="letter__top">
+              <p class="letter__meta">
+                <span class="t-label t-accent">Letter {letter.number}</span>
+                <time class="t-body">{letter.date}</time>
+              </p>
+              <h3 class="letter__question t-heading-l">{letter.question}</h3>
+            </div>
+            <p class="letter__theme">{letter.theme}</p>
+          </LetterCard>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .letters__intro {
+    max-width: 960px;
+  }
+  .letters__sub {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+
+  .letters__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-7);
+    margin-top: var(--space-8);
+    padding: 0;
+    list-style: none;
+  }
+  .letter {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-7);
+    height: 100%;
+    min-height: 415px;
+    padding: var(--space-7);
+  }
+  .letter__top {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .letter__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+  }
+  .letter__question {
+    line-height: 1.3;
+  }
+  .letter__theme {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-body);
+    line-height: 24px;
+  }
+
+  @media (max-width: 959px) {
+    .letters__list {
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+    }
+    .letter {
+      min-height: 0;
+      padding: var(--space-6);
+    }
+  }
+</style>

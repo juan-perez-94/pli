@@ -1,0 +1,61 @@
+---
+// Primary CTA. Renders a link (CTAs go to the Stripe payment link).
+// Pass `location` to tag the click in PostHog as pilot_cta_clicked { location }.
+import type { HTMLAttributes } from 'astro/types';
+import { CHECKOUT_URL } from '../../config';
+
+interface Props extends HTMLAttributes<'a'> {
+  location: string;
+  size?: 'm' | 's';
+  block?: boolean;
+}
+
+const { location, size = 'm', block = false, href = CHECKOUT_URL, class: className, ...rest } = Astro.props;
+---
+
+<a
+  class:list={['button', `button--${size}`, { 'button--block': block }, className]}
+  href={href}
+  data-ph-event="pilot_cta_clicked"
+  data-ph-location={location}
+  {...rest}
+>
+  <slot>Reserve your place</slot>
+</a>
+
+<style>
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4) var(--space-6);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--radius-s);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-family: var(--font-sans);
+    font-size: var(--text-button);
+    font-weight: var(--weight-medium);
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color var(--duration) var(--ease),
+      border-color var(--duration) var(--ease);
+  }
+  .button:hover {
+    background: #a90427;
+    border-color: #a90427;
+  }
+  .button:active {
+    background: #8f0321;
+  }
+  .button--s {
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-body);
+  }
+  .button--block {
+    display: flex;
+    width: 100%;
+  }
+</style>

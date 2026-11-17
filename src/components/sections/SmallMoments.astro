@@ -1,0 +1,121 @@
+---
+import quoteMark from '../../assets/figma/quote.svg';
+import Pli from '../ui/Pli.astro';
+---
+
+<section class="moments container" aria-labelledby="moments-title">
+  <figure class="moments__quote">
+    <img src={quoteMark.src} width="91" height="97" alt="" />
+    <blockquote class="t-display-m">
+      <p>While you plan the big day, don't forget to look at the person beside you."</p>
+    </blockquote>
+  </figure>
+
+  <div class="moments__body">
+    <h2 id="moments-title" class="moments__heading t-heading-l">
+      <span>Small moments, <em>big difference</em></span>
+    </h2>
+    <div class="moments__text t-body-l">
+      <p>
+        Love rarely lives in the big gestures. It lives in a glance across the table, a question at
+        the end of a long day, the moment one of you says "look at this" and the other really looks.
+      </p>
+      <p>
+        Psychologists call these moments bids. In a six-year study of newlyweds, <strong
+          >the couples who stayed together turned toward each other's bids 86% of the time.</strong
+        >
+        The couples who later divorced, 33%. <em
+          >(<a
+            href="https://www.gottman.com/blog/turn-toward-instead-of-away/"
+            target="_blank"
+            rel="noopener"
+            data-ph-event="source_link_clicked"
+            data-ph-source="gottman">The Gottman Institute</a
+          >)</em
+        >
+      </p>
+      <p class="moments__close">
+        Relationships aren't found. They're built, one small moment at a time. <Pli /> gives you a few
+        of those moments, to keep.
+      </p>
+    </div>
+
+    <p class="moments__next t-heading-l t-muted"><span>Your story, <em>kept</em></span></p>
+  </div>
+</section>
+
+<style>
+  .moments {
+    display: grid;
+    grid-template-columns: minmax(0, 432fr) minmax(0, 684fr);
+    column-gap: calc(124 / 1240 * 100%);
+    align-items: start;
+  }
+
+  .moments__quote {
+    position: relative;
+  }
+  .moments__quote img {
+    width: clamp(56px, 6.33vw, 91px);
+    height: auto;
+  }
+  .moments__quote blockquote {
+    margin-top: -9px;
+    line-height: 68px;
+  }
+
+  .moments__heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .moments__heading::before,
+  .moments__next::before {
+    content: '';
+    flex: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+  .moments__next {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  .moments__next::before {
+    background: transparent;
+  }
+
+  .moments__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+    padding-left: var(--space-6);
+  }
+  .moments__text strong {
+    font-weight: var(--weight-medium);
+  }
+  .moments__text a {
+    text-underline-offset: 3px;
+  }
+  .moments__close {
+    font-style: italic;
+    font-weight: var(--weight-medium);
+  }
+
+  @media (max-width: 959px) {
+    .moments {
+      grid-template-columns: 1fr;
+      row-gap: var(--space-8);
+    }
+    .moments__quote blockquote {
+      line-height: var(--leading-display-m);
+    }
+    .moments__text {
+      padding-left: 0;
+    }
+  }
+</style>

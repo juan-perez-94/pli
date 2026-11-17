@@ -1,0 +1,95 @@
+---
+// Bottom reservation bar. Slides in once the hero CTA has scrolled out of view
+// and hides again while the reserve band's own CTA is on screen.
+import Button from '../ui/Button.astro';
+import Logo from '../ui/Logo.astro';
+import MetaList from '../ui/MetaList.astro';
+import { PILOT } from '../../config';
+---
+
+<aside class="bar" aria-label="Reserve your place" data-bar data-visible="false">
+  <a class="bar__logo" href="#top" aria-label="pli, back to top">
+    <Logo width={100} />
+  </a>
+  <div class="bar__action">
+    <MetaList class="bar__meta" items={[PILOT.price, PILOT.seats, PILOT.firstLetter]} />
+    <Button class="bar__button" location="sticky_bar">Reserve your place</Button>
+  </div>
+</aside>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-bar]');
+  const heroCta = document.querySelector('[data-hero-cta]');
+  const band = document.querySelector('#reserve-title')?.closest('section');
+
+  if (bar && heroCta) {
+    let pastHero = false;
+    let bandVisible = false;
+    const update = () => {
+      const visible = pastHero && !bandVisible;
+      bar.dataset.visible = String(visible);
+      bar.inert = !visible;
+    };
+    new IntersectionObserver(([entry]) => {
+      pastHero = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      update();
+    }).observe(heroCta);
+    if (band) {
+      new IntersectionObserver(([entry]) => {
+        bandVisible = entry.isIntersecting;
+        update();
+      }).observe(band);
+    }
+    update();
+  }
+</script>
+
+<style>
+  .bar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding: var(--space-5) clamp(var(--space-4), 5.556vw, 80px);
+    padding-bottom: max(var(--space-5), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--color-line);
+    background: var(--color-paper);
+    transition: translate var(--duration) var(--ease);
+  }
+  .bar[data-visible='false'] {
+    translate: 0 110%;
+  }
+  .bar__logo {
+    flex: none;
+  }
+  .bar__action {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+  }
+  .bar__action :global(.bar__button) {
+    min-width: 276px;
+  }
+
+  @media (max-width: 959px) {
+    .bar {
+      padding-block: var(--space-3);
+      padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    }
+    .bar :global(.bar__meta) {
+      display: none;
+    }
+    .bar__action :global(.bar__button) {
+      min-width: 0;
+      padding: var(--space-3) var(--space-5);
+      font-size: var(--text-body);
+    }
+    .bar__logo :global(img) {
+      width: 72px;
+      height: auto;
+    }
+  }
+</style>

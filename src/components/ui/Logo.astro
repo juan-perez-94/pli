@@ -1,0 +1,16 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import logoInk from '../../assets/logo.svg';
+import logoWhite from '../../assets/logo-white.svg';
+
+interface Props extends Omit<HTMLAttributes<'img'>, 'src' | 'width' | 'height' | 'alt'> {
+  tone?: 'ink' | 'white';
+  width?: number;
+}
+
+const { tone = 'ink', width = 100, ...rest } = Astro.props;
+const src = tone === 'white' ? logoWhite : logoInk;
+const height = Math.round((width * src.height) / src.width);
+---
+
+<img src={src.src} width={width} height={height} alt="pli" {...rest} />

@@ -6,6 +6,8 @@
 // captured on click. Extra properties go in data-ph-* attributes, e.g.
 //   <a href="..." data-ph-event="cta_clicked" data-ph-location="hero">Join the pilot</a>
 // sends { location: "hero" }.
+//
+// For non-click events, dispatch a `ph:capture` CustomEvent on document (see below).
 ---
 
 <script>
@@ -32,6 +34,13 @@
         }
       }
       posthog.capture(el.dataset.phEvent!, props);
+    });
+
+    // Events that aren't plain clicks (e.g. an FAQ opening) are sent from components as:
+    //   document.dispatchEvent(new CustomEvent('ph:capture', { detail: { event, props } }))
+    document.addEventListener('ph:capture', (event) => {
+      const { event: name, props } = (event as CustomEvent<{ event: string; props?: Record<string, unknown> }>).detail;
+      posthog.capture(name, props);
     });
   }
 </script>
