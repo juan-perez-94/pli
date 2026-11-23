@@ -1,145 +1,375 @@
 ---
+// Hero: centred text with ten photos around it (Figma node 163:640, 1440×1024).
+// On load the photos spiral out from behind the headline one after another, clockwise from
+// 12 o'clock, land on their Figma positions and then float gently.
+// Desktop positions are the Figma px values; phones use a 6-photo layout (m* fields).
 import { Image } from 'astro:assets';
-import heroPhoto from '../../assets/figma/hero-photo.jpg';
+import type { ImageMetadata } from 'astro';
+import p01 from '../../assets/figma/hero/01.png';
+import p02 from '../../assets/figma/hero/02.png';
+import p03 from '../../assets/figma/hero/03.png';
+import p04 from '../../assets/figma/hero/04.png';
+import p05 from '../../assets/figma/hero/05.png';
+import p06 from '../../assets/figma/hero/06.png';
+import p07 from '../../assets/figma/hero/07.png';
+import p08 from '../../assets/figma/hero/08.png';
+import p09 from '../../assets/figma/hero/09.png';
+import p10 from '../../assets/figma/hero/10.png';
 import Button from '../ui/Button.astro';
 import Chip from '../ui/Chip.astro';
 import Logo from '../ui/Logo.astro';
 import MetaList from '../ui/MetaList.astro';
 import { PILOT } from '../../config';
+
+const FRAME = { w: 1440, h: 1024 };
+
+interface Photo {
+  src: ImageMetadata;
+  /** Figma frame position and size, px */
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  /** Phone layout: left/width in % of width, and top or bottom in px. Omit to hide on phones. */
+  m?: { x: number; w: number; top?: number; bottom?: number };
+}
+
+// Listed in entrance order: clockwise from 12 o'clock. `z` keeps Figma's stacking for overlaps.
+const photos: (Photo & { z: number })[] = [
+  { src: p03, x: 1053, y: 59, w: 181, h: 216, z: 6, m: { x: 60, w: 23, top: 88 } },
+  { src: p04, x: 1144, y: 217, w: 181, h: 145, z: 10, m: { x: 72, w: 25, top: 124 } },
+  { src: p05, x: 1266, y: 464, w: 141, h: 168, z: 1 },
+  { src: p07, x: 1134, y: 726, w: 141, h: 168, z: 3, m: { x: 68, w: 23, bottom: 44 } },
+  { src: p08, x: 1205, y: 830, w: 112, h: 133, z: 4 },
+  { src: p10, x: 630, y: 860, w: 181, h: 145, z: 9, m: { x: 37, w: 28, bottom: 12 } },
+  { src: p09, x: 98, y: 810, w: 112, h: 133, z: 5 },
+  { src: p06, x: 154, y: 686, w: 141, h: 168, z: 2, m: { x: 7, w: 23, bottom: 52 } },
+  { src: p01, x: 98, y: 217, w: 181, h: 216, z: 0 },
+  { src: p02, x: 295, y: 57, w: 181, h: 145, z: 8, m: { x: 5, w: 28, top: 100 } },
+];
+
+const pct = (n: number, of: number) => `${((n / of) * 100).toFixed(3)}%`;
+const styleFor = (p: Photo & { z: number }, i: number) =>
+  [
+    `--i:${i}`,
+    `--z:${p.z}`,
+    `--x:${pct(p.x, FRAME.w)}`,
+    `--y:${pct(p.y, FRAME.h)}`,
+    `--w:${pct(p.w, FRAME.w)}`,
+    `--ratio:${p.w}/${p.h}`,
+    p.m && `--mx:${p.m.x}%`,
+    p.m && `--mw:${p.m.w}%`,
+    p.m?.top !== undefined && `--mt:${p.m.top}px`,
+    p.m?.bottom !== undefined && `--mb:${p.m.bottom}px`,
+  ]
+    .filter(Boolean)
+    .join(';');
 ---
 
-<section class="hero container" aria-labelledby="hero-title">
-  <div class="poster">
-    <Image
-      class="poster__photo"
-      src={heroPhoto}
-      alt=""
-      widths={[480, 800, 1200]}
-      sizes="(min-width: 960px) 393px, 100vw"
-      loading="eager"
-      fetchpriority="high"
-    />
-    <Logo class="poster__logo" tone="white" width={150} />
-    <p class="poster__title" aria-hidden="true">Letters <em>for two.</em></p>
+<section class="hero" aria-labelledby="hero-title" data-orbit>
+  <div class="photos" aria-hidden="true">
+    {
+      photos.map((p, i) => (
+        <div class:list={['photo', { 'photo--desktop': !p.m }]} style={styleFor(p, i)}>
+          <Image
+            src={p.src}
+            alt=""
+            widths={[180, 360]}
+            sizes="(min-width: 960px) 13vw, 30vw"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      ))
+    }
   </div>
 
+  <header class="brand">
+    <Logo width={120} />
+    <span class="brand__rule"></span>
+    <p class="brand__tagline">Letters<br /><em>for two.</em></p>
+  </header>
+
   <div class="copy">
-    <div class="copy__chips">
-      <Chip tone="ink">{PILOT.edition}</Chip>
-      <Chip>{PILOT.season}</Chip>
+    <div class="copy__intro">
+      <div class="copy__chips">
+        <Chip tone="ink">{PILOT.edition}</Chip>
+        <Chip>{PILOT.season}</Chip>
+      </div>
+      <h1 id="hero-title" class="copy__title t-display-xl">
+        Your love story deserves <em>more than wedding photos.</em>
+      </h1>
+      <p class="copy__lede t-lede">
+        Three letters you each write alone and open together. <em
+          >Three evenings to stop planning and really look at the person you’re marrying.</em
+        >
+      </p>
     </div>
-    <h1 id="hero-title" class="copy__title t-display-xl">
-      Your love story deserves more than wedding photos.
-    </h1>
-    <p class="t-lede">
-      Three letters you each write alone and open together. <em
-        >Three evenings to stop planning and really look at the person you’re marrying.</em
-      >
-    </p>
     <div class="copy__cta" data-hero-cta>
-      <Button location="hero" block>Reserve your place</Button>
-      <MetaList items={[`${PILOT.price} per couple`, PILOT.seats, PILOT.firstLetter]} />
+      <MetaList class="copy__meta" items={[`${PILOT.price} per couple`, PILOT.seats, PILOT.firstLetter]} />
+      <Button location="hero">Reserve your place</Button>
     </div>
   </div>
 </section>
 
+<!-- Hide the photos before first paint so they don't flash in place before the entrance runs. -->
+<script is:inline>
+  (() => {
+    const hero = document.querySelector('[data-orbit]');
+    if (!hero || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    hero.dataset.orbit = 'pending';
+    // Safety net: if the animation script never loads, show the photos anyway.
+    setTimeout(() => {
+      if (hero.dataset.orbit === 'pending') hero.dataset.orbit = 'done';
+    }, 4000);
+  })();
+</script>
+
+<script>
+  const DURATION = 1100; // ms per photo
+  const STAGGER = 140; // ms between photos
+  const SWEEP = (130 * Math.PI) / 180; // how far each photo travels around the centre
+  const STEPS = 16;
+
+  const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+  const hero = document.querySelector<HTMLElement>('[data-orbit]');
+
+  if (hero && hero.dataset.orbit === 'pending') {
+    const photos = [...hero.querySelectorAll<HTMLElement>('.photo')].filter((el) => el.offsetParent !== null);
+    const title = hero.querySelector<HTMLElement>('.copy__title')!;
+
+    const run = () => {
+      const t = title.getBoundingClientRect();
+      const cx = t.left + t.width / 2;
+      const cy = t.top + t.height / 2;
+
+      photos.forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        const px = r.left + r.width / 2;
+        const py = r.top + r.height / 2;
+        const radius = Math.hypot(px - cx, py - cy);
+        const end = Math.atan2(py - cy, px - cx);
+        const start = end - SWEEP; // screen y points down, so increasing angle = clockwise
+
+        const keyframes: Keyframe[] = [];
+        for (let s = 0; s <= STEPS; s++) {
+          const k = s / STEPS;
+          const e = easeOut(k);
+          const a = start + SWEEP * e;
+          const d = radius * e;
+          const x = cx + Math.cos(a) * d - px;
+          const y = cy + Math.sin(a) * d - py;
+          keyframes.push({
+            offset: k,
+            transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${(-14 * (1 - e)).toFixed(2)}deg) scale(${(0.2 + 0.8 * e).toFixed(3)})`,
+            opacity: Math.min(1, k * 4),
+          });
+        }
+
+        el.animate(keyframes, {
+          duration: DURATION,
+          delay: i * STAGGER,
+          easing: 'linear', // easing is baked into the keyframes
+          fill: 'backwards',
+        });
+      });
+
+      hero.dataset.orbit = 'running';
+      window.setTimeout(() => (hero.dataset.orbit = 'done'), DURATION + STAGGER * photos.length);
+    };
+
+    hero.dataset.orbit = 'armed'; // tells the inline safety net this script is alive
+
+    // Give the first photos a moment to decode so they don't fly in blank.
+    const start = () => {
+      const ready = photos.slice(0, 4).map((el) => el.querySelector('img')?.decode().catch(() => undefined));
+      Promise.race([Promise.all(ready), new Promise((r) => setTimeout(r, 700))]).then(run);
+    };
+
+    // Opened in a background tab? Wait until it's actually seen.
+    if (document.visibilityState === 'visible') start();
+    else
+      document.addEventListener('visibilitychange', function onVisible() {
+        if (document.visibilityState !== 'visible') return;
+        document.removeEventListener('visibilitychange', onVisible);
+        start();
+      });
+  }
+</script>
+
 <style>
   .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 393fr) minmax(0, 744fr);
-    column-gap: calc(103 / 1240 * 100%);
+    position: relative;
+    width: 100%;
+    max-width: var(--page-max);
+    min-height: 820px;
+    aspect-ratio: 1440 / 1024;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    padding-top: clamp(var(--space-5), 5.97vw, 86px);
+    overflow: hidden;
   }
 
-  /* Poster: the phone-shaped photo card on the left. */
-  .poster {
-    position: relative;
-    aspect-ratio: 393 / 852;
-    overflow: hidden;
-    border-radius: var(--radius-xl);
-    background: var(--color-blush);
-    color: var(--color-paper);
-  }
-  .poster__photo {
+  /* ---- Photos ------------------------------------------------------------ */
+  .photos {
     position: absolute;
     inset: 0;
+    z-index: 0;
+  }
+  .photo {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    aspect-ratio: var(--ratio);
+    z-index: var(--z);
+    will-change: transform;
+  }
+  .photo :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 47% 40%;
-    transform: scale(1.128);
+    animation: float 7s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * -1.3s);
   }
-  .poster__logo {
-    position: absolute;
-    top: calc(107 / 852 * 100%);
-    left: 50%;
-    width: calc(150 / 393 * 100%);
-    height: auto;
-    translate: -50% 0;
+  @keyframes float {
+    from {
+      translate: 0 -5px;
+    }
+    to {
+      translate: 0 5px;
+    }
   }
-  .poster__title {
-    position: absolute;
-    left: calc(40 / 393 * 100%);
-    bottom: calc(91 / 852 * 100%);
-    font-family: var(--font-serif);
-    /* 116.6px on a 393px card → scale with the card width */
-    font-size: clamp(4rem, 8.1vw, 7.29rem);
-    line-height: 0.87;
-  }
-  .poster__title em {
-    display: block;
+  .hero:is([data-orbit='pending'], [data-orbit='armed']) .photo {
+    opacity: 0;
   }
 
+  /* ---- Brand lockup ------------------------------------------------------ */
+  .brand {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    margin-top: clamp(var(--space-5), 4.861vw, 70px);
+  }
+  .brand__rule {
+    width: 1px;
+    height: 84px;
+    background: var(--color-line);
+  }
+  .brand__tagline {
+    font-family: var(--font-serif);
+    font-size: 2.0725rem; /* 33.16px */
+    line-height: 0.87;
+  }
+
+  /* ---- Copy -------------------------------------------------------------- */
   .copy {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
+    align-items: center;
+    gap: var(--space-7);
+    width: min(787px, 58%);
+    text-align: center;
+  }
+  @media (min-width: 960px) {
+    /* Figma centres the copy on the frame, 15.5px below the middle. */
+    .copy {
+      position: absolute;
+      top: calc(50% + 15.5px);
+      left: 50%;
+      translate: -50% -50%;
+    }
+  }
+  .copy__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
   }
   .copy__chips {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-2);
   }
   .copy__title {
-    margin-top: calc(var(--space-4) - var(--space-5));
     line-height: 1.3;
+  }
+  .copy__lede {
+    max-width: 744px;
   }
   .copy__cta {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-5);
-    width: fit-content;
-    max-width: 100%;
-    margin-top: calc(var(--space-8) - var(--space-5));
+    align-items: center;
+    gap: var(--space-7);
+  }
+  .copy__cta :global(.copy__meta) {
+    justify-content: center;
   }
 
+  /* ---- Phones & small tablets ------------------------------------------- */
   @media (max-width: 959px) {
     .hero {
-      grid-template-columns: 1fr;
-      row-gap: var(--space-7);
+      aspect-ratio: auto;
+      min-height: 0;
+      padding-inline: var(--gutter);
+      padding-bottom: 200px;
     }
-    .poster {
-      aspect-ratio: 393 / 560;
-      max-height: 78svh;
+    /* Keep the phone arrangement at phone proportions on small tablets too. */
+    .photos {
+      left: 50%;
+      right: auto;
+      width: min(100%, 440px);
+      translate: -50% 0;
+    }
+    .photo {
+      left: var(--mx);
+      top: var(--mt, auto);
+      bottom: var(--mb, auto);
+      width: var(--mw);
+    }
+    .photo--desktop {
+      display: none;
+    }
+    .brand {
+      gap: var(--space-4);
+      margin-top: var(--space-5);
+    }
+    .brand :global(img) {
+      width: 84px;
+      height: auto;
+    }
+    .brand__rule {
+      height: 56px;
+    }
+    .brand__tagline {
+      font-size: 1.4rem;
+    }
+    .copy {
       width: 100%;
-      border-radius: var(--radius-l);
+      max-width: 560px;
+      margin-top: 140px;
+      gap: var(--space-5);
     }
-    .poster__photo {
-      transform: none;
-      object-position: 47% 30%;
+    .copy__title {
+      font-size: clamp(2.5rem, 11vw, 3rem);
+      line-height: 1.15;
     }
-    .poster__logo {
-      top: var(--space-7);
-      width: 120px;
-    }
-    .poster__title {
-      left: var(--space-6);
-      bottom: var(--space-6);
-      font-size: clamp(4rem, 18vw, 7.29rem);
+    .copy__lede {
+      font-size: 1.25rem;
     }
     .copy__cta {
+      gap: var(--space-5);
+      width: 100%;
+    }
+    .copy__cta :global(.button) {
       width: 100%;
     }
   }
